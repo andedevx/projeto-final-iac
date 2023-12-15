@@ -1,0 +1,4 @@
+[webservers]
+ec2-54-152-85-45.compute-1.amazonaws.com ansible_ssh_user=ubuntu ansible_ssh_private_key_file=./ssh/chave
+
+

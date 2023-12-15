@@ -1,0 +1,60 @@
+---
+- name: Instalação e Configuração do Ambiente
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Atualizar lista de pacotes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Git
+      apt:
+        name: git
+        state: present
+
+    - name: Instalar Docker CE
+      apt:
+        name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
+
+    - name: Adicionar chave GPG para repositório Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Adicionar repositório Docker
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Instalar Docker CE
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Instalar Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Clonar repositório do GitHub
+      git:
+        repo: https://github.com/Azure-Samples/azure-voting-app-redis.git
+        dest: /home/ubuntu/azure-voting-app-redis
+        update: yes
+
+    - name: Entrar na pasta do projeto
+      become_user: ubuntu
+      shell: cd /home/ubuntu/azure-voting-app-redis
+
+    - name: Run Docker Compose
+      become: true
+      shell: docker-compose up -d
+      args:
+        chdir: /home/ubuntu/azure-voting-app-redis
